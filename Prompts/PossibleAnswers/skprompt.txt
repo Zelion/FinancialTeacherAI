@@ -1,0 +1,6 @@
+Provide 3 possible short answers to the exam question: {{$question}}.
+First answer should be wrong.
+Second answer should be neither right nor wrong.
+Third answer should be correct.
+Take into account the context. Separate each answer with a line break. 
+Do not add additional characters.

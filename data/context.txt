@@ -1,0 +1,64 @@
+# What Is Finance?
+
+## Learning Outcomes
+
+By the end of this section, you will be able to:  
+- Describe the main areas in finance.  
+- Explain the importance of studying finance.  
+- Discuss the concepts of risk and return.  
+
+## Definition of Finance
+
+Finance is the study of the management, movement, and raising of money. The word finance can be used as a verb, such as when the First National Bank agrees to finance your home mortgage loan. It can also be used as a noun referring to an entire industry.  
+
+At its essence, the study of finance is about understanding the uses and sources of cash, as well as the concept of risk-reward trade-off. Finance is also a tool that can help us be better decision makers.  
+
+## Basic Areas in Finance
+
+Finance is divided into three primary areas in the domestic market: business finance, investments, and financial markets and institutions (see Figure 1.2). We look at each here in turn.
+
+### Business Finance
+
+Business finance looks at how managers can apply financial principles to maximize the value of a firm in a risky environment. Businesses have many stakeholders. In the case of corporations, the shareholders own the company, and they hire managers to run the company with the intent to maximize shareholder wealth.  
+
+Consequently, all management decisions should run through the filter of these questions:  
+- “How does this decision impact the wealth of the shareholders?”  
+- “Is this the best decision to be made for shareholders?”  
+
+In business finance, managers focus on three broad areas (see Figure 1.3).  
+
+#### Working Capital Management (WCM)
+
+Working capital management (WCM) is the study and management of short-term assets and liabilities. The chief financial officer (CFO) and the finance team are responsible for establishing company policy for how to manage WCM.  
+
+The finance department determines credit policy, establishes minimum criteria for the extension of credit to clients, terms of lending, when to extend, and when to take advantage of short-term creditor financing. The accounting department basically implements the finance department’s policies. In many firms, the accounting and finance functions operate in the same department; in others, they are separate.  
+
+#### Capital Budgeting
+
+Capital budgeting is the process of determining which long-term or fixed assets to acquire in an effort to maximize shareholder value. Capital budgeting decisions add the greatest value to a firm.  
+
+As such, capital budgeting is thought to be one of the most important financial functions within a firm. The capital budgeting process consists of estimating the value of potential investments by forecasting the size, timing, and risk of cash flows associated with the investments.  
+
+The finance department develops and compiles cash flow estimates with input from the marketing, operations, accounting, human resources, and economics departments to develop a portfolio of investment projects that collectively maximize the value of the firm.  
+
+#### Capital Structure
+
+Capital structure is the process by which managers focus more specifically on long-term debt and increasing shareholder wealth. Capital structure questions require financial managers to work with economists, lenders, underwriters, investment bankers, and other sources of external financial information and financial capital.  
+
+When Bacon Signs developed its financial plan, the executives included each of these three aspects of business finance into the plan.  
+
+### Investments
+
+Investments are products and processes used to create and grow wealth. Most commonly, investment topics include the discussion and application of the different types of financial instruments, delivery vehicles, regulation, and risk-and-return opportunities.  
+
+Topics also include a discussion of stocks, bonds, and derivative securities such as futures and options. A broad coverage of investment instruments would include mutual funds, exchange-traded funds (ETFs), and investment vehicles such as 401k plans or individual retirement accounts (IRAs).  
+
+In addition, real assets such as gold, real estate, and commodities are also common discussion topics and investment opportunities.  
+
+### Financial Markets and Institutions
+
+Financial markets and institutions are the firms and regulatory agencies that oversee our financial system. There is overlap in this area with investments and business finance, as the firms involved are profit-seeking and need good financial management.  
+
+They also are commonly the firms that facilitate investment practices in our economy. A financial institution regulated by a federal or state agency will likely handle an individual investment such as the purchase of a stock or mutual fund.  
+
+Much of the US regulatory structure for financial markets and institutions developed in the 1930s as a response to the stock market crash of 1929 and the subsequent Great Depression. In the United States, the desire for safety and protection of investors and the financial industry led to the development of many of our primary regulatory agencies and financial regulations.  

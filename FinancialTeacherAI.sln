@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialTeacherAI", "FinancialTeacherAI.csproj", "{20B321B5-96BB-3341-D401-900A8394576C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20B321B5-96BB-3341-D401-900A8394576C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B321B5-96BB-3341-D401-900A8394576C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B321B5-96BB-3341-D401-900A8394576C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B321B5-96BB-3341-D401-900A8394576C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B26C6511-CAB4-4477-8C5F-33299A44D188}
+	EndGlobalSection
+EndGlobal

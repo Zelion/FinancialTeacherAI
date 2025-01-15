@@ -1,0 +1,4 @@
+This is the question made to the student: {{$question}}
+Provide a score from 1 to 10 of the student's answer: {{$answer}}
+To score this answer, you only need to review the provided chunks: {{$relevant_chunks}}, and nothing else.
+The student could be using different words to the ones in the context, but the answer could still be correct, take that into account.

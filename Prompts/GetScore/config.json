@@ -1,0 +1,28 @@
+{
+    "schema": 1,
+    "type": "completion",
+    "description": "Provide a score of the student's answer",
+    "execution_settings": {
+        "default": {
+            "max_tokens": 1000,
+            "temperature": 0
+        }
+    },
+    "input_variables": [
+        {
+            "name": "question",
+            "description": "The exam question made to the student",
+            "required": true
+        },
+        {
+            "name": "answer",
+            "description": "The student's answer to the exam question",
+            "required": true
+        },
+        {
+            "name": "relevant_chunks",
+            "description": "The chunks needed to score the student's answer",
+            "required": true
+        }
+    ]
+}
