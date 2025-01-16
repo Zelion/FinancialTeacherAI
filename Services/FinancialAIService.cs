@@ -19,7 +19,6 @@ public class FinancialAIService : IFinancialAIService
     public async Task<string> GetScoreAsync(ExamDTO examDTO)
     {
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
         var textEmbedding = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
@@ -48,6 +47,6 @@ public class FinancialAIService : IFinancialAIService
             }
         );
 
-        return score;
+        return score ?? string.Empty;
     }
 }

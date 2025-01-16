@@ -10,9 +10,9 @@ public class PineconeService : IPineconeService
         IConfiguration configuration
         )
     {
-        _pineconeApiKey = configuration["Pinecone:ApiKey"];
-        _pineconeIndexName = configuration["Pinecone:IndexName"];
-        _pineconeNamespace = configuration["Pinecone:Namespace"];
+        _pineconeApiKey = configuration["Pinecone:ApiKey"] ?? throw new ArgumentNullException("Pinecone:ApiKey");
+        _pineconeIndexName = configuration["Pinecone:IndexName"] ?? throw new ArgumentNullException("Pinecone:IndexName");
+        _pineconeNamespace = configuration["Pinecone:Namespace"] ?? throw new ArgumentNullException("Pinecone:Namespace");
     }
 
     /// <summary>
@@ -73,13 +73,19 @@ public class PineconeService : IPineconeService
                 MaxRetries = 3
             }
         );
-        
-        if (queryResult.Matches != null)
+
+        if (queryResult != null && queryResult.Matches != null)
         {
             foreach (var match in queryResult.Matches)
             {
-                if (match.Metadata != null && match.Metadata.Any() && match.Metadata.ContainsKey("text"))
-                    relevantChunks.Add(match.Metadata["text"].ToString());
+                if (match != null && match.Metadata != null && match.Metadata.Any() && match.Metadata.ContainsKey("text"))
+                {
+                    var metadata = match.Metadata["text"];
+                    if (metadata != null)
+                    {
+                        relevantChunks.Add(metadata.ToString());
+                    }
+                }
             }
         }
 

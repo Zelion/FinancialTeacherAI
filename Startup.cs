@@ -2,7 +2,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
-using Microsoft.SemanticKernel.Embeddings;
 
 namespace FinancialTeacherAI
 {
@@ -17,6 +16,10 @@ namespace FinancialTeacherAI
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var apiKey = Configuration["AzureOpenAIChatCompletion:ApiKey"];
+            var endpoint = Configuration["AzureOpenAIChatCompletion:Endpoint"];
+            var chatDeploymentName = Configuration["AzureOpenAIChatCompletion:DeploymentName"];
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -24,21 +27,22 @@ namespace FinancialTeacherAI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FinancialTeacherAI API", Version = "v1" });
             });
 
-
             services.AddSingleton<IChatCompletionService>(sp =>
             {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var apiKey = Configuration["AzureOpenAIChatCompletion:ApiKey"];
-                var endpoint = Configuration["AzureOpenAIChatCompletion:Endpoint"];
-                var chatDeploymentName = Configuration["AzureOpenAIChatCompletion:DeploymentName"];
                 return new AzureOpenAIChatCompletionService(chatDeploymentName!, endpoint!, apiKey!);
             });
 
 #pragma warning disable SKEXP0010
+            
+            if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey))
+            {
+                throw new ArgumentNullException("Azure OpenAI endpoint or API key cannot be null or empty.");
+            }
+
             services.AddAzureOpenAITextEmbeddingGeneration(
                 deploymentName: "text-embedding-ada-002",
-                Configuration["AzureOpenAIChatCompletion:Endpoint"],
-                Configuration["AzureOpenAIChatCompletion:ApiKey"]
+                endpoint,
+                apiKey
             );
 
             services.AddKeyedTransient("FinancialAIKernel", (sp, key) =>

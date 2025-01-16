@@ -14,17 +14,15 @@ public class EmbeddingService : IEmbeddingService
         _pineconeService = pineconeService;
     }
 
-/// <summary>
-/// Get's the context and stores the embeddings in Pinecone index
-/// </summary>
-/// <returns></returns>
+    /// <summary>
+    /// Get's the context and stores the embeddings in Pinecone index
+    /// </summary>
+    /// <returns></returns>
     public async Task GenerateContextEmbeddingAsync()
     {
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
         var textEmbedding = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
 
         string contextPath = Path.Combine(Directory.GetCurrentDirectory(), @"data\context.txt");
         var chunks = ChunkHelper.ChunkTextByHeader(File.ReadAllText(contextPath));
