@@ -53,6 +53,7 @@ namespace FinancialTeacherAI
             });
 
             // Register services for dependency injection
+            services.AddScoped<IPromptService, PromptService>();
             services.AddScoped<IPineconeService, PineconeService>();
             services.AddScoped<IEmbeddingService, EmbeddingService>();
             services.AddScoped<IFinancialAIService, FinancialAIService>();

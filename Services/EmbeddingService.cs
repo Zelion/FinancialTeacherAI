@@ -6,12 +6,25 @@ public class EmbeddingService : IEmbeddingService
     private readonly Kernel _kernel;
     private readonly IPineconeService _pineconeService;
 
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    private readonly ITextEmbeddingGenerationService _textEmbeddingGenerationService;
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
     public EmbeddingService(
         [FromKeyedServices("FinancialAIKernel")] Kernel kernel,
         IPineconeService pineconeService)
     {
         _kernel = kernel;
         _pineconeService = pineconeService;
+
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        _textEmbeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    }
+
+    public async Task<ReadOnlyMemory<float>> GenerateEmbeddingAsync(string text)
+    {
+        return await _textEmbeddingGenerationService.GenerateEmbeddingAsync(text);
     }
 
     /// <summary>
@@ -20,16 +33,12 @@ public class EmbeddingService : IEmbeddingService
     /// <returns></returns>
     public async Task GenerateContextEmbeddingAsync()
     {
-#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        var textEmbedding = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
         string contextPath = Path.Combine(Directory.GetCurrentDirectory(), @"data\context.txt");
         var chunks = ChunkHelper.ChunkTextByHeader(File.ReadAllText(contextPath));
         var chunkEmbeddings = new List<ChunkEmbedding>();
         foreach (string chunk in chunks)
         {
-            var chunkEmbedding = await textEmbedding.GenerateEmbeddingAsync(chunk);
+            var chunkEmbedding = await _textEmbeddingGenerationService.GenerateEmbeddingAsync(chunk);
             chunkEmbeddings.Add(new ChunkEmbedding
             {
                 Embedding = chunkEmbedding.ToArray(),

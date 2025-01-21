@@ -1,0 +1,7 @@
+Compare this facts that are true {{$rightFacts}}
+with this ones from the user {{$userFacts}}
+
+If the {{$userFacts}} is "There are no facts to retrieve from this answer" then give the minimum score.
+
+Score the user's facts from 1 to 10
+Concisely explain why.

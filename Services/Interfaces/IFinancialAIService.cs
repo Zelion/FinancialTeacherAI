@@ -1,4 +1,4 @@
 public interface IFinancialAIService
 {
-    Task<string> GetScoreAsync(ExamDTO examDTO);
+    Task<string> GenerateScoreAsync(ExamDTO examDTO);
 }

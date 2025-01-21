@@ -32,7 +32,7 @@ namespace FinancialTeacherAI.Controllers
                 Question = question,
                 Answer = answer
             };
-            var score = await _financialAIService.GetScoreAsync(examDTO);
+            var score = await _financialAIService.GenerateScoreAsync(examDTO);
 
             return Ok(score);
         }

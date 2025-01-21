@@ -1,0 +1,4 @@
+Extract {{$numberOfFacts}} facts from this statement: {{$statement}}
+You have to compare the statement: {{$statement}} against the relevant chunks {{$relevant_chunks}} to retrieve the facts.
+The answer has to be a list separated by a line break.
+If there are no facts to retrieve, say: "There are no facts to retrieve from this answer"

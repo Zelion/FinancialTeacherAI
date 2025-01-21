@@ -1,52 +1,55 @@
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.SemanticKernel.Embeddings;
-
 public class FinancialAIService : IFinancialAIService
 {
-    private readonly Kernel _kernel;
+    private readonly ILogger _logger;
     private readonly IPineconeService _pineconeService;
+    private readonly IPromptService _promptService;
+    private readonly IEmbeddingService _embeddingService;
 
     public FinancialAIService(
-        [FromKeyedServices("FinancialAIKernel")] Kernel kernel,
-        IPineconeService pineconeService
+        ILogger<FinancialAIService> logger,
+        IPineconeService pineconeService,
+        IPromptService promptService,
+        IEmbeddingService embeddingService
         )
     {
-        _kernel = kernel;
+        _logger = logger;
         _pineconeService = pineconeService;
+        _promptService = promptService;
+        _embeddingService = embeddingService;
     }
 
-    public async Task<string> GetScoreAsync(ExamDTO examDTO)
+    public async Task<string> GenerateScoreAsync(ExamDTO examDTO)
     {
-#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        var textEmbedding = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        int numberOfFacts = 4;
 
-        var settings = new OpenAIPromptExecutionSettings
+        try
         {
-            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-            ChatSystemPrompt = $@"You are finance teacher and you are reviewing student exams and giving scores based on the answers.",
-        };
+            _logger.LogInformation($"Generating Score: Question: {examDTO.Question} Student answer {examDTO.Answer}");
 
-        var prompts = _kernel.ImportPluginFromPromptDirectory(@$"{Directory.GetCurrentDirectory()}\Prompts");
-        // await _kernel.InvokePromptAsync(@"Print the next line: 'Answer the following questions: '", new(settings));
+            // Embbed student answer
+            var questionEmbedding = await _embeddingService.GenerateEmbeddingAsync(examDTO.Question);
+            // Retrieve relevant chunks based on answer
+            var relevantChunks = await _pineconeService.RetrieveRelevantChunksAsync(questionEmbedding.ToArray(), 3);
+            var relevantChunksText = string.Join("\n", relevantChunks);
 
-        // Embbed student answer
-        var answerEmbedding = await textEmbedding.GenerateEmbeddingAsync(examDTO.Answer);
-        // Retrieve relevant chunks based on answer
-        var relevantChunks = await _pineconeService.RetrieveRelevantChunksAsync(answerEmbedding.ToArray(), 3);
+            var rightAnswer = await _promptService.GetRightAnswerAsync(examDTO.Question, relevantChunksText);
+            var rightFacts = await _promptService.GetFactsAsync(numberOfFacts, rightAnswer, relevantChunksText);
+            var userFacts = await _promptService.GetFactsAsync(numberOfFacts, examDTO.Answer, relevantChunksText);
 
-        var score = await _kernel.InvokeAsync<string>(
-            prompts["GetScore"],
-            new()
-            {
-                    { "question", examDTO.Question },
-                    { "answer", examDTO.Answer },
-                    { "relevant_chunks", string.Join("\n", relevantChunks) },
-                    { "settings", settings }
-            }
-        );
+            _logger.LogInformation($"Right answer: {rightAnswer}");
+            _logger.LogInformation($"Right facts: {rightFacts}");
+            _logger.LogInformation($"User facts: {userFacts}");
 
-        return score ?? string.Empty;
+            //var score = await GetScoreAsync(examDTO.Question, examDTO.Answer, relevantChunksText);
+
+            var scoreOnFacts = await _promptService.GetScoreOnFactsAsync(rightFacts, userFacts);
+
+            return scoreOnFacts ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating score");
+            return string.Empty;
+        }
     }
 }
