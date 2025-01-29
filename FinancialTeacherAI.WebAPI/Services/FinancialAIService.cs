@@ -20,7 +20,7 @@ public class FinancialAIService : IFinancialAIService
 
     public async Task<string> GenerateScoreAsync(ExamDTO examDTO)
     {
-        int numberOfFacts = 4;
+        //int numberOfFacts = 2;
 
         try
         {
@@ -33,16 +33,12 @@ public class FinancialAIService : IFinancialAIService
             var relevantChunksText = string.Join("\n", relevantChunks);
 
             var rightAnswer = await _promptService.GetRightAnswerAsync(examDTO.Question, relevantChunksText);
-            var rightFacts = await _promptService.GetFactsAsync(numberOfFacts, rightAnswer, relevantChunksText);
-            var userFacts = await _promptService.GetFactsAsync(numberOfFacts, examDTO.Answer, relevantChunksText);
-
-            _logger.LogInformation($"Right answer: {rightAnswer}");
-            _logger.LogInformation($"Right facts: {rightFacts}");
-            _logger.LogInformation($"User facts: {userFacts}");
+            var rightFacts = await _promptService.GetFactsAsync(rightAnswer, relevantChunksText);
+            //var userFacts = await _promptService.GetFactsAsync(numberOfFacts, examDTO.Answer, relevantChunksText);
 
             //var score = await GetScoreAsync(examDTO.Question, examDTO.Answer, relevantChunksText);
 
-            var scoreOnFacts = await _promptService.GetScoreOnFactsAsync(rightFacts, userFacts);
+            var scoreOnFacts = await _promptService.GetScoreOnFactsAsync(rightFacts, examDTO.Answer);
 
             return scoreOnFacts ?? string.Empty;
         }

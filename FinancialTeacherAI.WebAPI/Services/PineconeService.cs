@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using Microsoft.SemanticKernel;
 using Pinecone;
 
 public class PineconeService : IPineconeService
@@ -56,7 +58,12 @@ public class PineconeService : IPineconeService
     /// <param name="topK"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public async Task<List<string>> RetrieveRelevantChunksAsync(float[] queryEmbedding, int topK)
+    [KernelFunction,
+    Description("Retrieves the relevant chunks from the provided embedding to use as context for the exam")]
+    public async Task<List<string>> RetrieveRelevantChunksAsync(
+        [Description("The embedding from where to retrieve the relevant chunks")] float[] queryEmbedding, 
+        [Description("The ammount of chunks to be retrieved")] int topK
+        )
     {
         var relevantChunks = new List<string>();
 

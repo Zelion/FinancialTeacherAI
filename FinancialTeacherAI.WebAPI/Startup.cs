@@ -32,8 +32,6 @@ namespace FinancialTeacherAI
                 return new AzureOpenAIChatCompletionService(chatDeploymentName!, endpoint!, apiKey!);
             });
 
-#pragma warning disable SKEXP0010
-            
             if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey))
             {
                 throw new ArgumentNullException("Azure OpenAI endpoint or API key cannot be null or empty.");
@@ -57,6 +55,9 @@ namespace FinancialTeacherAI
             services.AddScoped<IPineconeService, PineconeService>();
             services.AddScoped<IEmbeddingService, EmbeddingService>();
             services.AddScoped<IFinancialAIService, FinancialAIService>();
+
+            // Add enterprise components
+            services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
 
@@ -5,10 +6,7 @@ public class EmbeddingService : IEmbeddingService
 {
     private readonly Kernel _kernel;
     private readonly IPineconeService _pineconeService;
-
-#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     private readonly ITextEmbeddingGenerationService _textEmbeddingGenerationService;
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
     public EmbeddingService(
         [FromKeyedServices("FinancialAIKernel")] Kernel kernel,
@@ -17,12 +15,14 @@ public class EmbeddingService : IEmbeddingService
         _kernel = kernel;
         _pineconeService = pineconeService;
 
-#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         _textEmbeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     }
 
-    public async Task<ReadOnlyMemory<float>> GenerateEmbeddingAsync(string text)
+    [KernelFunction,
+    Description("Generates the embeddings from the provided text so it can be used for similarity search")]
+    public async Task<ReadOnlyMemory<float>> GenerateEmbeddingAsync(
+        [Description("The text to generate the embeddings from")] string text
+        )
     {
         return await _textEmbeddingGenerationService.GenerateEmbeddingAsync(text);
     }

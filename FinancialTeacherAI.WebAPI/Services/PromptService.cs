@@ -22,7 +22,7 @@ public class PromptService : IPromptService
         _settings = new OpenAIPromptExecutionSettings
         {
             ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-            ChatSystemPrompt = $@"You are finance teacher and you are reviewing student exams and giving scores based on the answers.",
+            ChatSystemPrompt = $@"You are finance teacher and you are reviewing student exams and giving scores based on the answers. Take each question and answer as a separate entity.",
         };
     }
 
@@ -49,7 +49,7 @@ public class PromptService : IPromptService
         }
     }
 
-    public async Task<string> GetFactsAsync(int numberOfFacts, string statement, string relevantChunks)
+    public async Task<string> GetFactsAsync(string statement, string relevantChunks)
     {
         try
         {
@@ -57,7 +57,6 @@ public class PromptService : IPromptService
                 _prompts["GetFacts"],
                 new()
                 {
-                    { "numberOfFacts", numberOfFacts },
                     { "statement", statement },
                     { "relevant_Chunks", relevantChunks },
                     { "settings", _settings }
@@ -97,7 +96,7 @@ public class PromptService : IPromptService
         }
     }
 
-    public async Task<string> GetScoreOnFactsAsync(string rightFacts, string userFacts)
+    public async Task<string> GetScoreOnFactsAsync(string rightFacts, string answer)
     {
         try
         {
@@ -106,7 +105,7 @@ public class PromptService : IPromptService
                 new()
                 {
                     { "rightFacts", rightFacts },
-                    { "userFacts", userFacts },
+                    { "answer", answer },
                     { "settings", _settings }
                 }
             );
