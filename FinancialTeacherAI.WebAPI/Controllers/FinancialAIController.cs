@@ -7,15 +7,15 @@ namespace FinancialTeacherAI.Controllers
     public class FinancialAIController : ControllerBase
     {
         private readonly IFinancialAIService _financialAIService;
-        private readonly IEmbeddingService _embeddingService;
+        private readonly IPineconeService _pineconeService;
 
         public FinancialAIController(
             IFinancialAIService financialAIService,
-            IEmbeddingService embeddingService
+            IPineconeService pineconeService
         )
         {
             _financialAIService = financialAIService;
-            _embeddingService = embeddingService;
+            _pineconeService = pineconeService;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace FinancialTeacherAI.Controllers
         [HttpPost("embbedContext")]
         public IActionResult EmbbedContext()
         {
-            _embeddingService.GenerateContextEmbeddingAsync();
+            _pineconeService.GenerateContextEmbeddingAsync();
 
             return Ok();
         }

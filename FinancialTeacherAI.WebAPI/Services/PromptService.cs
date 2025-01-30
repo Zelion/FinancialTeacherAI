@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
@@ -7,10 +8,8 @@ public class PromptService : IPromptService
     private readonly ILogger _logger;
     private readonly KernelPlugin _prompts;
 
-    private readonly OpenAIPromptExecutionSettings _settings;
-
     public PromptService(
-        [FromKeyedServices("FinancialAIKernel")] Kernel kernel,
+        Kernel kernel,
         ILogger<PromptService> logger
         )
     {
@@ -18,15 +17,13 @@ public class PromptService : IPromptService
         _logger = logger;
 
         _prompts = _kernel.ImportPluginFromPromptDirectory(@$"{Directory.GetCurrentDirectory()}\Prompts");
-
-        _settings = new OpenAIPromptExecutionSettings
-        {
-            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-            ChatSystemPrompt = $@"You are finance teacher and you are reviewing student exams and giving scores based on the answers. Take each question and answer as a separate entity.",
-        };
     }
 
-    public async Task<string> GetRightAnswerAsync(string question, string relevantChunks)
+    [KernelFunction,
+    Description("Recover the correct answer to a question based on the relevant chunks.")]
+    public async Task<string> GetRightAnswerAsync(
+        string question, 
+        string relevantChunks)
     {
         try
         {
@@ -35,8 +32,7 @@ public class PromptService : IPromptService
                 new()
                 {
                     { "question", question },
-                    { "relevant_chunks", relevantChunks },
-                    { "settings", _settings }
+                    { "relevant_chunks", relevantChunks }
                 }
             );
 
@@ -49,6 +45,8 @@ public class PromptService : IPromptService
         }
     }
 
+    [KernelFunction,
+    Description("Generate the facts from the right answer based on the relevant chunks.")]
     public async Task<string> GetFactsAsync(string statement, string relevantChunks)
     {
         try
@@ -58,8 +56,7 @@ public class PromptService : IPromptService
                 new()
                 {
                     { "statement", statement },
-                    { "relevant_Chunks", relevantChunks },
-                    { "settings", _settings }
+                    { "relevant_Chunks", relevantChunks }
                 }
             );
 
@@ -82,8 +79,7 @@ public class PromptService : IPromptService
                 {
                     { "question", question },
                     { "answer", answer },
-                    { "relevant_chunks", relevantChunks },
-                    { "settings", _settings }
+                    { "relevant_chunks", relevantChunks }
                 }
             );
 
@@ -96,6 +92,8 @@ public class PromptService : IPromptService
         }
     }
 
+    [KernelFunction,
+    Description("Generate score based on the facts.")]
     public async Task<string> GetScoreOnFactsAsync(string rightFacts, string answer)
     {
         try
@@ -105,8 +103,7 @@ public class PromptService : IPromptService
                 new()
                 {
                     { "rightFacts", rightFacts },
-                    { "answer", answer },
-                    { "settings", _settings }
+                    { "answer", answer }
                 }
             );
 

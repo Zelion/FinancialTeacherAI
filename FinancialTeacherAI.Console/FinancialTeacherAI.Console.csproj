@@ -11,6 +11,19 @@
     <ProjectReference Include = "..\FinancialTeacherAI.WebAPI\FinancialTeacherAI.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
   <PropertyGroup>
     <NoWarn>$(NoWarn);CA2007;IDE1006;SKEXP0001;SKEXP0110;OPENAI001;SKEXP0101;SKEXP0010</NoWarn>
   </PropertyGroup>

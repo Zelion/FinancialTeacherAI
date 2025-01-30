@@ -26,17 +26,12 @@ public class FinancialAIService : IFinancialAIService
         {
             _logger.LogInformation($"Generating Score: Question: {examDTO.Question} Student answer {examDTO.Answer}");
 
-            // Embbed student answer
-            var questionEmbedding = await _embeddingService.GenerateEmbeddingAsync(examDTO.Question);
-            // Retrieve relevant chunks based on answer
-            var relevantChunks = await _pineconeService.RetrieveRelevantChunksAsync(questionEmbedding.ToArray(), 3);
+            // Retrieve relevant chunks based on question
+            var relevantChunks = await _pineconeService.RetrieveRelevantChunksAsync(examDTO.Question, 3);
             var relevantChunksText = string.Join("\n", relevantChunks);
 
             var rightAnswer = await _promptService.GetRightAnswerAsync(examDTO.Question, relevantChunksText);
             var rightFacts = await _promptService.GetFactsAsync(rightAnswer, relevantChunksText);
-            //var userFacts = await _promptService.GetFactsAsync(numberOfFacts, examDTO.Answer, relevantChunksText);
-
-            //var score = await GetScoreAsync(examDTO.Question, examDTO.Answer, relevantChunksText);
 
             var scoreOnFacts = await _promptService.GetScoreOnFactsAsync(rightFacts, examDTO.Answer);
 

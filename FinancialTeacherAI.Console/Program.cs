@@ -4,69 +4,19 @@ using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-                .Build();
-
-var apiKey = config["AzureOpenAIChatCompletion:ApiKey"];
-var endpoint = config["AzureOpenAIChatCompletion:Endpoint"];
-var deployment = config["AzureOpenAIChatCompletion:DeploymentName"];
-
-var host = Host.CreateDefaultBuilder(args)
-.ConfigureServices((context, services) =>
-{
-    // Register services
-    services.AddTransient<IEmbeddingService, EmbeddingService>();
-    services.AddTransient<IPineconeService, PineconeService>();
-    services.AddSingleton<IChatCompletionService>(sp =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        
-        return new AzureOpenAIChatCompletionService(deployment!, endpoint!, apiKey!);
-    });
-
-    services.AddAzureOpenAITextEmbeddingGeneration(
-                deploymentName: "text-embedding-ada-002",
-                endpoint,
-                apiKey
-            );
-
-    services.AddKeyedTransient("FinancialAIKernel", (sp, key) =>
-    {
-        // Create a collection of plugins that the kernel will use
-        KernelPluginCollection pluginCollection = new();
-        return new Kernel(sp, pluginCollection);
-    });
-
-    // Add enterprise components
-    services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
-})
-.Build();
+var kernel = CreateKernelWithChatCompletion();
+var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
 var settings = new OpenAIPromptExecutionSettings
 {
     ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-    ChatSystemPrompt = @"You are a financial teacher's assisstant. You are tasked with giving score to an exam solved by a student.
-                        You will be provided with the questions for the exam.
-                        First thing you will do is give the student the exam questions and ask the student to answer them as a bullet point separated by a line break (wait for his answer).
-                        Once you recieve the answers from the student you will accomplish the next tasks for each question and answer:
-                        1- Generate the embeddings from the student's answer and retrieve the relevant chunks using those generated embeddings.
-                        2- Use the generated chunks to answer the exam question from your perspective and retrieve facts for that answer.
-                        3- Use the generated chunks to retrieve facts from the student's answer.
-                        Parallelize when possible.
-                        Once the facts for both your answer as well as the student's answer are generated, compare them, and state why you think the student's answer is correct or not, then score it.
-                        "
+    ChatSystemPrompt = @"You are a financial teacher's assisstant. You are tasked with giving score to an exam solved by a student (user).
+                        Provide the exam questions to the student and wait for him to answer.
+                        Don't provide the answers to the student. Evaluate the student's answer and provide a score based on the correctness of the answer.
+                        Once you are done with all the questions, take each score from the questions and give the average score of the overall exam from 1 to 10.",
 };
-
-// Initialize the Semantic Kernel
-var kernel = host.Services.GetKeyedService<Kernel>("FinancialAIKernel");
-kernel.ImportPluginFromType<EmbeddingService>();
-kernel.ImportPluginFromType<PineconeService>();
-var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
 var chatHistory = new ChatHistory();
 chatHistory.AddSystemMessage(@"Exam Questions: 
@@ -82,8 +32,7 @@ do
         break;
     }
 
-    var message = new ChatMessageContent(AuthorRole.User, input);
-    chatHistory.Add(message);
+    chatHistory.AddUserMessage(input);
 
     var response = await chatCompletionService.GetChatMessageContentAsync(
         chatHistory,
@@ -94,3 +43,54 @@ do
     Console.WriteLine(response);
 }
 while (true);
+
+
+static Kernel CreateKernelWithChatCompletion()
+{
+    var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                    .Build();
+
+    var apiKey = configuration["AzureOpenAIChatCompletion:ApiKey"];
+    var endpoint = configuration["AzureOpenAIChatCompletion:Endpoint"];
+    var deployment = configuration["AzureOpenAIChatCompletion:DeploymentName"];
+
+    var builder = Kernel.CreateBuilder();
+
+    builder.Services.AddAzureOpenAIChatCompletion(
+        deployment!,
+        endpoint!,
+        apiKey!,
+        "gpt-4o");
+    builder.Services.AddAzureOpenAITextEmbeddingGeneration(
+        deploymentName: "text-embedding-ada-002",
+        endpoint,
+        apiKey
+    );
+
+    builder.Services.AddSingleton<IConfiguration>(configuration);
+    builder.Services.AddTransient(sp =>
+    {
+        // Create a collection of plugins that the kernel will use
+        KernelPluginCollection pluginCollection = new();
+        return new Kernel(sp, pluginCollection);
+    });
+    builder.Services.AddTransient<IEmbeddingService, EmbeddingService>();
+    builder.Services.AddTransient<IPineconeService, PineconeService>();
+    builder.Services.AddSingleton<IChatCompletionService>(sp =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+
+        return new AzureOpenAIChatCompletionService(deployment!, endpoint!, apiKey!);
+    });
+
+    builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
+
+    var kernel = builder.Build();
+    kernel.ImportPluginFromType<PineconeService>();
+    kernel.ImportPluginFromType<PromptService>();
+
+    return kernel;
+}

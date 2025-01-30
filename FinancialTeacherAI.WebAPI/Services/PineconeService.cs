@@ -4,6 +4,8 @@ using Pinecone;
 
 public class PineconeService : IPineconeService
 {
+    private readonly IEmbeddingService _embeddingService;
+
     private readonly string _pineconeApiKey;
     private readonly string _pineconeIndexName;
     private readonly string _pineconeNamespace;
@@ -12,9 +14,11 @@ public class PineconeService : IPineconeService
     private readonly IndexClient index;
 
     public PineconeService(
-        IConfiguration configuration
+        IConfiguration configuration,
+        IEmbeddingService embeddingService
         )
     {
+        _embeddingService = embeddingService;
         _pineconeApiKey = configuration["Pinecone:ApiKey"] ?? throw new ArgumentNullException("Pinecone:ApiKey");
         _pineconeIndexName = configuration["Pinecone:IndexName"] ?? throw new ArgumentNullException("Pinecone:IndexName");
         _pineconeNamespace = configuration["Pinecone:Namespace"] ?? throw new ArgumentNullException("Pinecone:Namespace");
@@ -59,13 +63,15 @@ public class PineconeService : IPineconeService
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     [KernelFunction,
-    Description("Retrieves the relevant chunks from the provided embedding to use as context for the exam")]
+    Description("Retrieves the relevant chunks from the provided text to use as context for the exam")]
     public async Task<List<string>> RetrieveRelevantChunksAsync(
-        [Description("The embedding from where to retrieve the relevant chunks")] float[] queryEmbedding, 
+        [Description("The text from where to retrieve the relevant chunks")] string text, 
         [Description("The ammount of chunks to be retrieved")] int topK
         )
     {
         var relevantChunks = new List<string>();
+
+        var queryEmbedding = await _embeddingService.GenerateEmbeddingAsync(text);
 
         var queryResult = await index.QueryAsync(
             new QueryRequest
@@ -97,6 +103,28 @@ public class PineconeService : IPineconeService
         }
 
         return relevantChunks;
+    }
+
+    /// <summary>
+    /// Get's the context and stores the embeddings in Pinecone index
+    /// </summary>
+    /// <returns></returns>
+    public async Task GenerateContextEmbeddingAsync()
+    {
+        string contextPath = Path.Combine(Directory.GetCurrentDirectory(), @"data\context.txt");
+        var chunks = ChunkHelper.ChunkTextByHeader(File.ReadAllText(contextPath));
+        var chunkEmbeddings = new List<ChunkEmbedding>();
+        foreach (string chunk in chunks)
+        {
+            var chunkEmbedding = await _embeddingService.GenerateEmbeddingAsync(chunk);
+            chunkEmbeddings.Add(new ChunkEmbedding
+            {
+                Embedding = chunkEmbedding.ToArray(),
+                Text = chunk
+            });
+        }
+
+        await StoreEmbeddingsAsync(chunkEmbeddings);
     }
 
     public async Task DeleteAllAsync()

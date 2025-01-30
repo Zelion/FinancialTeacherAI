@@ -10,11 +10,6 @@
     },
     "input_variables": [
         {
-            "name": "numberOfFacts",
-            "description": "The number of facts to be retrieved",
-            "required": true
-        },
-        {
             "name": "statement",
             "description": "The statement to get the facts from",
             "required": true
